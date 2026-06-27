@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiwar Bahasa Arab Interaktif</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter (Latin) & Amiri (Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Amiri', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .arabic-text {
+            direction: rtl;
+        }
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- Navbar / Header -->
+    <header class="bg-gradient-to-r from-teal-800 via-brand-900 to-emerald-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-2.5 rounded-xl border border-white/20">
+                    <i class="fa-solid fa-comments text-2xl text-emerald-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">اللقاء في المقهى</h1>
+                    <p class="text-xs text-emerald-200 font-medium">Hiwar Interaktif: Pertemuan di Kafe & Akhir Pekan</p>
+                </div>
+            </div>
+            
+            <!-- Quick Target Banner -->
+            <div class="flex items-center space-x-4 bg-white/10 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-sm text-sm">
+                <div class="flex items-center text-emerald-300 font-semibold gap-1.5">
+                    <i class="fa-regular fa-clock animate-pulse"></i>
+                    <span>Target Durasi:</span>
+                </div>
+                <div class="font-mono bg-emerald-950 px-2 py-1 rounded text-emerald-400 font-bold border border-emerald-800">
+                    03:00 Menit
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6">
+        
+        <!-- Controls & Utility Column (Sidebar) -->
+        <section class="w-full lg:w-80 flex flex-col gap-6 shrink-0">
+            <!-- Pacing Helper Card -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full translate-x-12 -translate-y-12 -z-0 opacity-50"></div>
+                <div class="relative z-10">
+                    <h2 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-hourglass-start text-emerald-600"></i>
+                        Pengukur Tempo (Timer)
+                    </h2>
+                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                        Gunakan timer ini saat mempraktikkan dialog. Cobalah berbicara perlahan dan tenang hingga mencapai target 3 menit.
+                    </p>
+                    
+                    <!-- Timer Display -->
+                    <div class="flex flex-col items-center justify-center py-4 bg-slate-50 rounded-xl border border-slate-100 mb-4 font-mono">
+                        <span id="timer-display" class="text-4xl font-bold text-slate-700 tracking-wider">00:00</span>
+                        <span class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Elapsed Time</span>
+                    </div>
+
+                    <!-- Timer Action Buttons -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="btn-timer-toggle" onclick="toggleTimer()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition text-white font-medium py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 shadow-sm">
+                            <i id="icon-timer-play" class="fa-solid fa-play"></i>
+                            <span id="text-timer-play">Mulai</span>
+                        </button>
+                        <button onclick="resetTimer()" class="bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-600 font-medium py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Display & Practice Controls -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-emerald-600"></i>
+                    Pengaturan Latihan
+                </h3>
+
+                <!-- Filter Role Mode -->
+                <div class="mb-5">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Fokus Peran</label>
+                    <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-lg">
+                        <button onclick="setRoleFilter('all')" id="role-all" class="text-xs font-semibold py-2 px-2.5 rounded-md transition text-slate-700 bg-white shadow-xs">Semua</button>
+                        <button onclick="setRoleFilter('Ahmad')" id="role-ahmad" class="text-xs font-semibold py-2 px-2.5 rounded-md transition text-slate-600 hover:text-slate-900">Ahmad</button>
+                        <button onclick="setRoleFilter('Faisal')" id="role-faisal" class="text-xs font-semibold py-2 px-2.5 rounded-md transition text-slate-600 hover:text-slate-900">Faisal</button>
+                    </div>
+                </div>
+
+                <!-- Display Toggles -->
+                <div class="space-y-3 mb-5 border-t border-slate-100 pt-4">
+                    <span class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Elemen Teks</span>
+                    
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800">Teks Arab (Harakat)</span>
+                        <input type="checkbox" id="toggle-arabic" checked onchange="toggleViewElements()" class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800">Transliterasi (Latin)</span>
+                        <input type="checkbox" id="toggle-trans" checked onchange="toggleViewElements()" class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800">Terjemahan Indonesia</span>
+                        <input type="checkbox" id="toggle-translation" checked onchange="toggleViewElements()" class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+                </div>
+
+                <!-- Text Size Adjuster -->
+                <div class="border-t border-slate-100 pt-4">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Ukuran Font Arab</label>
+                    <div class="flex items-center justify-between gap-4">
+                        <button onclick="adjustFontSize(-2)" class="text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-lg flex items-center justify-center transition">
+                            <i class="fa-solid fa-minus text-xs"></i>
+                        </button>
+                        <span id="font-size-label" class="text-sm font-mono font-bold text-slate-600">28px</span>
+                        <button onclick="adjustFontSize(2)" class="text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-lg flex items-center justify-center transition">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini Glossary / Vocabulary Highlight -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-emerald-600"></i>
+                    Kosakata Kunci
+                </h3>
+                <div class="space-y-3 divide-y divide-slate-100 max-h-52 overflow-y-auto pr-1">
+                    <div class="pt-2 first:pt-0 flex justify-between items-center">
+                        <span class="font-arabic text-lg text-emerald-800 font-bold" dir="rtl">لَمْ نَلْتَقِ</span>
+                        <span class="text-xs text-slate-600">Kita tidak bertemu</span>
+                    </div>
+                    <div class="pt-2 flex justify-between items-center">
+                        <span class="font-arabic text-lg text-emerald-800 font-bold" dir="rtl">مُنْذُ فَتْرَةٍ طَوِيلَةٍ</span>
+                        <span class="text-xs text-slate-600">Sejak waktu yang lama</span>
+                    </div>
+                    <div class="pt-2 flex justify-between items-center">
+                        <span class="font-arabic text-lg text-emerald-800 font-bold" dir="rtl">الِامْتِحَان النِّهَائِيِّ</span>
+                        <span class="text-xs text-slate-600">Ujian Akhir</span>
+                    </div>
+                    <div class="pt-2 flex justify-between items-center">
+                        <span class="font-arabic text-lg text-emerald-800 font-bold" dir="rtl">الْقَوَاعِدَ</span>
+                        <span class="text-xs text-slate-600">Tata Bahasa (Qawaid)</span>
+                    </div>
+                    <div class="pt-2 flex justify-between items-center">
+                        <span class="font-arabic text-lg text-emerald-800 font-bold" dir="rtl">الْمُفْرَدَاتِ</span>
+                        <span class="text-xs text-slate-600">Kosakata</span>
+                    </div>
+                    <div class="pt-2 flex justify-between items-center">
+                        <span class="font-arabic text-lg text-emerald-800 font-bold" dir="rtl">عُطْلَةِ نِهَايَةِ الْأُسْبُوعِ</span>
+                        <span class="text-xs text-slate-600">Akhir Pekan</span>
+                    </div>
+                    <div class="pt-2 flex justify-between items-center">
+                        <span class="font-arabic text-lg text-emerald-800 font-bold" dir="rtl">تَجْدِيدِ النَّشَاطِ</span>
+                        <span class="text-xs text-slate-600">Menyegarkan Pikiran</span>
+                    </div>
+                    <div class="pt-2 flex justify-between items-center">
+                        <span class="font-arabic text-lg text-emerald-800 font-bold" dir="rtl">الْمُمَارَسَةُ</span>
+                        <span class="text-xs text-slate-600">Praktik/Latihan</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dialogue Box Column -->
+        <section class="flex-grow flex flex-col gap-4">
+            <!-- Instructions and Quick Stats banner -->
+            <div class="bg-gradient-to-r from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h4 class="text-sm font-bold text-slate-700">Cara Berlatih:</h4>
+                        <p class="text-xs text-slate-500">Klik tombol speaker (<i class="fa-solid fa-volume-high text-xs text-emerald-600"></i>) di tiap percakapan untuk mendengar audio panduannya.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500 font-medium">Auto-scroll:</span>
+                    <button id="btn-autoscroll" onclick="toggleAutoScroll()" class="bg-emerald-600/15 text-emerald-700 hover:bg-emerald-600/20 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                        <i id="icon-autoscroll" class="fa-solid fa-toggle-on text-emerald-600"></i>
+                        <span>ON</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Dialogue Container -->
+            <div id="dialogue-container" class="space-y-4">
+                <!-- Javascript will render the interactive cards here -->
+            </div>
+            
+            <!-- Complete/Summary Banner -->
+            <div id="practice-complete-card" class="hidden bg-emerald-600 text-white rounded-2xl p-6 shadow-md transition-all flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Latihan Selesai! ممتاز (Mumtaz)</h4>
+                        <p class="text-sm text-emerald-100">Hebat! Anda telah membaca atau mendengarkan seluruh dialog 3 menit ini.</p>
+                    </div>
+                </div>
+                <button onclick="resetPractice()" class="bg-white text-emerald-800 font-semibold text-sm px-5 py-2.5 rounded-xl hover:bg-emerald-50 transition active:scale-95 shadow-sm">
+                    Mulai Ulang Latihan
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-sm py-6 mt-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>© 2026 Al-Hiwar Interactive App. Dibuat untuk melatih kefasihan membaca Arab.</p>
+            <div class="flex space-x-4">
+                <span class="text-xs bg-slate-800 px-3 py-1 rounded-full text-slate-300">Tema: اللقاء في المقهى (Pertemuan di Kafe)</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Dialog Data representation
+        const dialogueData = [
+            {
+                id: 1,
+                character: "Ahmad",
+                arabic: "السَّلَامُ عَلَيْكُمْ يَا فَيْصَلُ! كَيْفَ حَالُكَ؟",
+                transliteration: "Assalamu'alaikum ya Faisal! Kaifa haluk?",
+                translation: "Assalamu'alaikum Faisal! Bagaimana kabarmu?",
+                note: "Sapaan santai namun sopan."
+            },
+            {
+                id: 2,
+                character: "Faisal",
+                arabic: "وَعَلَيْكُمُ السَّلَامُ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ يَا أَحْمَدُ! أَنَا بِخَيْرٍ، وَالْحَمْدُ للهِ. وَأَنْتَ؟",
+                transliteration: "Wa'alaikumussalam warahmatullah wabarakatuh ya Ahmad! Ana bikhair, walhamdulillah. Wa anta?",
+                translation: "Wa'alaikumussalam warahmatullah wabarakatuh Ahmad! Aku baik-baik saja, alhamdulillah. Dan kamu?",
+                note: "Jawaban sapaan lengkap."
+            },
+            {
+                id: 3,
+                character: "Ahmad",
+                arabic: "اَلْحَمْدُ للهِ، أَنَا بِخَيْرٍ أَيْضًا. لَمْ نَلْتَقِ مُنْذُ فَتْرَةٍ طَوِيلَةٍ! مَاذَا تَفْعَلُ هُنَا فِي هَذَا الْمَقْهَى؟",
+                transliteration: "Alhamdulillah, ana bikhairin aidhan. Lam naltaqi mundzu fatrah thawilah! Madza taf'al huna fi hadzal maqha?",
+                translation: "Alhamdulillah, aku juga baik. Kita sudah lama tidak bertemu! Apa yang sedang kamu lakukan di kafe ini?",
+                note: "Menyatakan kerinduan setelah sekian lama."
+            },
+            {
+                id: 4,
+                character: "Faisal",
+                arabic: "نَعَمْ، هَذَا صَحِيحٌ. أَنَا أَدْرُسُ لِلِامْتِحَانِ النِّهَائِيِّ لِلُغَةِ الْعَرَبِيَّةِ الْأُسْبُوعَ الْقَادِمَ. وَأَنْتَ، مَاذَا تَفْعَلُ هُنَا؟",
+                transliteration: "Na'am, hadza shahih. Ana adrusu lil-imtihan al-niha'iy lil-lughah al-'arabiyyah al-usbu' al-qadim. Wa anta, madza taf'al huna?",
+                translation: "Ya, benar sekali. Aku sedang belajar untuk ujian akhir bahasa Arab minggu depan. Kalau kamu sendiri sedang apa di sini?",
+                note: "Menyampaikan kesibukan saat ini."
+            },
+            {
+                id: 5,
+                character: "Ahmad",
+                arabic: "جِئْتُ لِأَسْتَرِيحَ قَلِيلًا وَأَشْرَبَ الْقَهْوَةَ بَعْدَ يَوْمٍ طَوِيلٍ فِي الْجَامِعَةِ. هَلِ الِامْتِحَانُ صَعْبٌ؟",
+                transliteration: "Ji'tu li-astariha qalilan wa asyraba al-qahwah ba'da yaumin thawil fil-jami'ah. Hal il-imtihanu sha'bun?",
+                translation: "Aku datang untuk istirahat sebentar dan minum kopi setelah hari yang panjang di kampus. Apakah ujiannya sulit?",
+                note: "Frasa istirahat sejenak."
+            },
+            {
+                id: 6,
+                character: "Faisal",
+                arabic: "لَيْسَ صَعْبًا جِدًّا، لَكِنَّهُ يَحْتَاجُ إِلَى الْكَثِيرِ مِنَ الْمُرَاجَعَةِ، خَاصَّةً الْقَوَاعِدَ وَالْمُفْرَدَاتِ الْجَدِيدَةَ.",
+                transliteration: "Laisa sha'ban jiddan, lakinahu yahtaju ilal-katsiri minal-muraja'ah, khash-shatan al-qawa'id wal-mufrodat al-jadidah.",
+                translation: "Tidak terlalu sulit, tapi butuh banyak mengulang pelajaran, terutama tata bahasa (qawa'id) dan kosakata baru.",
+                note: "Tips belajar penting."
+            },
+            {
+                id: 7,
+                character: "Ahmad",
+                arabic: "بِالتَّوْفِيقِ يَا صَدِيقِي! بِالْمُنَاسَبَةِ، مَا هِيَ خُطَّتُكَ لِعُطْلَةِ نِهَايَةِ الْأُسْبُوعِ؟",
+                transliteration: "Bit-taufiqi ya shadiqi! Bil-munasabah, ma hiya khuth-thatuka li-'uthlat nihayatil-usbu'?",
+                translation: "Semoga sukses, kawanku! Omong-omong, apa rencanamu untuk akhir pekan ini?",
+                note: "Mendoakan kesuksesan temannya."
+            },
+            {
+                id: 8,
+                character: "Faisal",
+                arabic: "أُفَكِّرُ فِي الذَّهَابِ إِلَى الْمَكْتَبَةِ الْعَامَّةِ يَوْمَ السَّبْتِ، ثُمَّ الِاسْتِرْخَاءِ مَعَ عَائِلَتِي يَوْمَ الْأَحَدِ. وَمَاذَا عَنْكَ؟",
+                transliteration: "Ufakkiru fidz-dzahabi ilal-maktabatil-'ammah yaumas-sabti, tsummal-istirkha'i ma'a 'a'ilati yaumal-ahadi. Wa madza 'anka?",
+                translation: "Aku berpikir untuk pergi ke perpustakaan umum hari Sabtu, lalu bersantai bersama keluarga hari Minggu. Bagaimana denganmu?",
+                note: "Menyusun agenda akhir pekan."
+            },
+            {
+                id: 9,
+                character: "Ahmad",
+                arabic: "سَأَذْهَبُ لِزِيَارَةِ جَدِّي فِي الْقَرْيَةِ. الْجَوُّ هُنَاكَ جَمِيلٌ جِدًّا وَهَادِئٌ، وَيُسَاعِدُ عَلَى تَجْدِيدِ النَّشَاطِ.",
+                transliteration: "Sa-adzhabu liziyaarati jaddi fil-qaryah. Al-jawwu hunaka jamilun jiddan wa hadi', wa yusa'idu 'ala tajdidin-nasyath.",
+                translation: "Aku akan pergi mengunjungi kakekku di desa. Udara di sana sangat indah dan tenang, sangat membantu untuk menyegarkan pikiran.",
+                note: "Menggunakan kata estetik untuk suasana pedesaan."
+            },
+            {
+                id: 10,
+                character: "Faisal",
+                arabic: "هَذَا رَائِعٌ حَقًّا! أَتَمَنَّى لَكَ رِحْلَةً مُمْتِعَةً.",
+                transliteration: "Hadza ra'i'un haqqan! Atamanna laka rihlatan mumti'ah.",
+                translation: "Eso sungguh luar biasa! Aku harap perjalananmu menyenangkan.",
+                note: "Ungkapan mendoakan perjalanan."
+            },
+            {
+                id: 11,
+                character: "Ahmad",
+                arabic: "شُكْرًا لَكَ. يَا فَيْصَلُ، هَلْ تُرِيدُ أَنْ نَطْلُبَ شَيْئًا لِنَشْرَبَهُ مَعًا الْآنَ؟ أَنَا سَأَدْفَعُ!",
+                transliteration: "Syukran laka. Ya Faisal, hal turidu an nathluba syai'an linsyrabahu ma'an al-aan? Ana sa-adfa'!",
+                translation: "Terima kasih. Faisal, apakah kamu mau kita memesan sesuatu untuk diminum bersama sekarang? Aku yang bayar!",
+                note: "Menawarkan traktiran sebagai keramahan (Generosity)."
+            },
+            {
+                id: 12,
+                character: "Faisal",
+                arabic: "شُكْرًا جَزِيلًا لَكَ، هَذَا لُطْفٌ كَبِيرٌ مِنْكَ! أُرِيدُ عَصِيرَ الْبُرْتُقَالِ الْبَارِدَ مِنْ فَضْلِكَ.",
+                transliteration: "Syukran jazilan laka, hadza luthfun kabirun minka! Uridu 'ashiral-burtuqal al-barid min fadhlik.",
+                translation: "Terima kasih banyak, kamu baik sekali! Aku mau jus jeruk dingin saja, tolong.",
+                note: "Cara memesan minuman secara sopan."
+            },
+            {
+                id: 13,
+                character: "Ahmad",
+                arabic: "حَسَنًا، سَأَطْلُبُ عَصِيرَ الْبُرْتُقَالِ لَكَ، وَقَهْوَةً سَوْدَاءَ لِي. (يُنَادِي النَّادِلَ) يَا نَادِلُ، مِنْ فَضْلِكَ!",
+                transliteration: "Hasanan, sa-athlubu 'ashiral-burtuqal laka, wa qahwatan sauda'a li. (Yunadin-nadil) Ya nadil, min fadhlik!",
+                translation: "Baik, aku pesankan jus jeruk untukmu dan kopi hitam untukku. (Memanggil pelayan) Pelayan, tolong ke sini!",
+                note: "Memanggil pelayan kafe menggunakan kata 'Nadil'."
+            },
+            {
+                id: 14,
+                character: "Faisal",
+                arabic: "بَعْدَ الْمَشْرُوبِ، هَلْ يُمْكِنُنَا أَنْ نَتَحَدَّثَ قَلِيلًا بِاللُغَةِ الْعَرَبِيَّةِ لِمُمَارَسَتِهَا؟",
+                transliteration: "Ba'dal-masyrub, hal yumkinuna an natahaddatsa qalilan bil-lughah al-'arabiyyah limumarasatiha?",
+                translation: "Setelah minumannya datang, bisakah kita mengobrol sebentar memakai bahasa Arab untuk latihan?",
+                note: "Mengajukan usulan latihan bahasa."
+            },
+            {
+                id: 15,
+                character: "Ahmad",
+                arabic: "فِكْرَةٌ مُمْتَازَةٌ! الْمُمَارَسَةُ هِيَ أَفْضَلُ طَرِيقَةٍ لِتَعَلُّمِ اللُّغَةِ. هَيَّا بِنَا نَبْدَأُ الْآنَ!",
+                transliteration: "Fikrah mumtazah! Al-mumarasah hiya afdhalu thariqatin lita'allumil-lughah. Hayya bina nabda' al-aan!",
+                translation: "Ide yang luar biasa! Praktik langsung adalah cara terbaik untuk belajar bahasa. Ayo kita mulai sekarang!",
+                note: "Menyetujui usulan dengan antusias."
+            },
+            {
+                id: 16,
+                character: "Faisal",
+                arabic: "رَائِعٌ! شُكْرًا لَكَ يَا أَحْمَدُ عَلَى وَقْتِكَ وَمُسَاعَدَتِكَ.",
+                transliteration: "Ra'i'! Syukran laka ya Ahmad 'ala waqtika wa musa'adatika.",
+                translation: "Bagus! Terima kasih Ahmad atas waktu dan bantuanmu.",
+                note: "Ungkapan terima kasih yang tulus."
+            },
+            {
+                id: 17,
+                character: "Ahmad",
+                arabic: "لَا شُكْرَ عَلَى وَاجِبٍ يَا صَدِيقِي. نَحْنُ دَائِمًا نَدْعَمُ بَعْضُنَا الْبَعْضَ.",
+                transliteration: "La syukra 'ala wajib ya shadiqi. Nahnu da'iman nad'amu ba'dhana al-ba'dh.",
+                translation: "Sama-sama, kawanku (tidak perlu berterima kasih untuk kewajiban). Kita memang harus selalu saling mendukung.",
+                note: "Kalimat penutup persahabatan yang kuat."
+            }
+        ];
+
+        // Application State
+        let currentRoleFilter = 'all'; // 'all', 'Ahmad', 'Faisal'
+        let arabicFontSize = 26; // in pixels
+        let isAudioPlaying = false;
+        let activeSpeakerId = null;
+        let visitedLines = new Set();
+        let autoScroll = true;
+
+        // Timer State Variables
+        let timerInterval = null;
+        let totalSeconds = 0;
+        let isTimerRunning = false;
+
+        // DOM Elements Loading
+        window.onload = function() {
+            renderDialogue();
+            setupVoiceRecognition();
+        };
+
+        // Main rendering engine
+        function renderDialogue() {
+            const container = document.getElementById('dialogue-container');
+            container.innerHTML = '';
+
+            dialogueData.forEach((line) => {
+                // Determine CSS styling based on character
+                const isAhmad = line.character === 'Ahmad';
+                const roleBorder = isAhmad 
+                    ? 'border-emerald-500 bg-emerald-50/20' 
+                    : 'border-sky-500 bg-sky-50/20';
+                
+                const badgeColor = isAhmad 
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                    : 'bg-sky-100 text-sky-800 border-sky-200';
+
+                // Handle hidden/dimmed states for interactive roleplay selection
+                let filterClass = '';
+                if (currentRoleFilter !== 'all' && currentRoleFilter !== line.character) {
+                    filterClass = 'opacity-30 scale-98 blur-[0.4px] grayscale-[20%] transition-all duration-300';
+                } else {
+                    filterClass = 'shadow-xs border-l-4 transition-all duration-300';
+                }
+
+                // Checkbox checked state
+                const isVisited = visitedLines.has(line.id);
+                const visitedBgClass = isVisited ? 'border-dashed border-slate-300 bg-slate-50' : 'bg-white';
+
+                const cardHtml = `
+                    <div id="dialogue-card-${line.id}" class="dialogue-card p-5 rounded-2xl border border-slate-100 ${visitedBgClass} ${roleBorder} ${filterClass} relative group hover:shadow-md transition">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-3">
+                            <!-- Character Badge and Controls -->
+                            <div class="flex items-center space-x-2.5">
+                                <span class="px-3.5 py-1 text-xs font-bold rounded-full border ${badgeColor}">
+                                    ${line.character}
+                                </span>
+                                <span class="text-slate-400 text-xs font-mono font-medium">Line ${line.id} of ${dialogueData.length}</span>
+                            </div>
+                            
+                            <!-- Actions panel -->
+                            <div class="flex items-center gap-2 self-end md:self-auto">
+                                <!-- TTS Pronunciation Tool -->
+                                <button onclick="playVoiceText(${line.id}, '${line.arabic.replace(/'/g, "\\'")}')" class="speech-btn text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 w-8 h-8 rounded-lg flex items-center justify-center transition active:scale-90" title="Dengarkan Suara">
+                                    <i id="play-icon-${line.id}" class="fa-solid fa-volume-high text-sm"></i>
+                                </button>
+                                
+                                <!-- Read Checklist -->
+                                <button onclick="toggleVisited(${line.id})" class="text-slate-400 hover:text-emerald-600 w-8 h-8 rounded-lg flex items-center justify-center transition" title="Tandai Sudah Dibaca">
+                                    <i id="check-icon-${line.id}" class="fa-regular ${isVisited ? 'fa-circle-check text-emerald-600' : 'fa-circle'} text-base"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Dialogue Texts Block -->
+                        <div class="space-y-2 mt-3 text-right">
+                            <!-- Arabic Typography -->
+                            <p id="arabic-${line.id}" class="arabic-text font-arabic leading-loose text-slate-800 select-all font-semibold" style="font-size: ${arabicFontSize}px">
+                                ${line.arabic}
+                            </p>
+
+                            <!-- Latin Transliteration -->
+                            <p id="trans-${line.id}" class="trans-text text-left text-slate-500 font-medium italic text-xs sm:text-sm mt-2 border-l-2 border-slate-200 pl-3">
+                                ${line.transliteration}
+                            </p>
+
+                            <!-- Indonesian Translation -->
+                            <p id="translation-${line.id}" class="translation-text text-left text-slate-700 text-sm mt-1">
+                                ${line.translation}
+                            </p>
+                        </div>
+                        
+                        <!-- Mini tooltip/explanation popup -->
+                        <div class="mt-3.5 pt-2.5 border-t border-dashed border-slate-100 flex items-center gap-1.5 text-[11px] text-slate-400">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                            <span>${line.note}</span>
+                        </div>
+                    </div>
+                `;
+
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            // Re-apply visibility based on global checkbox states
+            toggleViewElements();
+            checkPracticeStatus();
+        }
+
+        // Play Text using Web Speech API
+        function playVoiceText(id, text) {
+            // If already speaking, cancel current speech
+            if (window.speechSynthesis.isSpeaking) {
+                window.speechSynthesis.cancel();
+                if (activeSpeakerId !== null) {
+                    resetVoiceIcon(activeSpeakerId);
+                }
+                if (activeSpeakerId === id) {
+                    activeSpeakerId = null;
+                    return;
+                }
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ar-SA'; // Arabic (Saudi Arabia)
+            utterance.rate = 0.85;     // Slightly slower for learning purposes
+
+            // Try to find a premium Arabic voice if available on system
+            const voices = window.speechSynthesis.getVoices();
+            const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+            if (arabicVoice) {
+                utterance.voice = arabicVoice;
+            }
+
+            // UI feedback of voice activity
+            utterance.onstart = function() {
+                activeSpeakerId = id;
+                const icon = document.getElementById(`play-icon-${id}`);
+                const card = document.getElementById(`dialogue-card-${id}`);
+                
+                if (icon) {
+                    icon.className = 'fa-solid fa-circle-notch animate-spin text-emerald-600';
+                }
+                if (card) {
+                    card.classList.add('ring-2', 'ring-emerald-500/40', 'bg-emerald-50/10');
+                }
+                
+                // Keep tracks of line progress as user plays sounds
+                markVisited(id);
+            };
+
+            utterance.onend = function() {
+                resetVoiceIcon(id);
+                activeSpeakerId = null;
+                
+                // Optional: Auto-Scroll to next line when audio ends
+                if (autoScroll && id < dialogueData.length) {
+                    const nextCard = document.getElementById(`dialogue-card-${id + 1}`);
+                    if (nextCard) {
+                        nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            };
+
+            utterance.onerror = function() {
+                resetVoiceIcon(id);
+                activeSpeakerId = null;
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function resetVoiceIcon(id) {
+            const icon = document.getElementById(`play-icon-${id}`);
+            const card = document.getElementById(`dialogue-card-${id}`);
+            if (icon) {
+                icon.className = 'fa-solid fa-volume-high text-sm';
+            }
+            if (card) {
+                card.classList.remove('ring-2', 'ring-emerald-500/40', 'bg-emerald-50/10');
+            }
+        }
+
+        // Setup voices asynchronous compatibility in Chrome/Firefox
+        function setupVoiceRecognition() {
+            if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                window.speechSynthesis.onvoiceschanged = function() {
+                    // Pre-fetch voices
+                    window.speechSynthesis.getVoices();
+                };
+            }
+        }
+
+        // Filtering roles to hide/highlight
+        function setRoleFilter(role) {
+            currentRoleFilter = role;
+            
+            // Adjust active CSS state on buttons
+            const btnAll = document.getElementById('role-all');
+            const btnAhmad = document.getElementById('role-ahmad');
+            const btnFaisal = document.getElementById('role-faisal');
+
+            btnAll.className = 'text-xs font-semibold py-2 px-2.5 rounded-md transition ' + 
+                (role === 'all' ? 'text-slate-700 bg-white shadow-xs' : 'text-slate-600 hover:text-slate-900');
+            
+            btnAhmad.className = 'text-xs font-semibold py-2 px-2.5 rounded-md transition ' + 
+                (role === 'Ahmad' ? 'text-slate-700 bg-white shadow-xs' : 'text-slate-600 hover:text-slate-900');
+
+            btnFaisal.className = 'text-xs font-semibold py-2 px-2.5 rounded-md transition ' + 
+                (role === 'Faisal' ? 'text-slate-700 bg-white shadow-xs' : 'text-slate-600 hover:text-slate-900');
+
+            renderDialogue();
+        }
+
+        // Adjust Arabic Font Size
+        function adjustFontSize(delta) {
+            const newSize = arabicFontSize + delta;
+            if (newSize >= 18 && newSize <= 48) {
+                arabicFontSize = newSize;
+                document.getElementById('font-size-label').innerText = `${newSize}px`;
+                
+                // Live resize on active display
+                dialogueData.forEach((line) => {
+                    const el = document.getElementById(`arabic-${line.id}`);
+                    if (el) el.style.fontSize = `${newSize}px`;
+                });
+            }
+        }
+
+        // Controlling visibility of dialogue elements
+        function toggleViewElements() {
+            const showArabic = document.getElementById('toggle-arabic').checked;
+            const showTrans = document.getElementById('toggle-trans').checked;
+            const showTranslation = document.getElementById('toggle-translation').checked;
+
+            dialogueData.forEach((line) => {
+                const elAr = document.getElementById(`arabic-${line.id}`);
+                const elTr = document.getElementById(`trans-${line.id}`);
+                const elTrans = document.getElementById(`translation-${line.id}`);
+
+                if (elAr) {
+                    if (showArabic) elAr.classList.remove('hidden');
+                    else elAr.classList.add('hidden');
+                }
+                if (elTr) {
+                    if (showTrans) elTr.classList.remove('hidden');
+                    else elTr.classList.add('hidden');
+                }
+                if (elTrans) {
+                    if (showTranslation) elTrans.classList.remove('hidden');
+                    else elTrans.classList.add('hidden');
+                }
+            });
+        }
+
+        // Checklist states
+        function toggleVisited(id) {
+            if (visitedLines.has(id)) {
+                visitedLines.delete(id);
+            } else {
+                visitedLines.add(id);
+            }
+            renderDialogue();
+        }
+
+        function markVisited(id) {
+            visitedLines.add(id);
+            // Re-render only changes visually to avoid cutting audio
+            const checkIcon = document.getElementById(`check-icon-${id}`);
+            const card = document.getElementById(`dialogue-card-${id}`);
+            if (checkIcon) {
+                checkIcon.className = 'fa-solid fa-circle-check text-emerald-600';
+            }
+            if (card) {
+                card.classList.remove('bg-white');
+                card.classList.add('border-dashed', 'border-slate-300', 'bg-slate-50');
+            }
+            checkPracticeStatus();
+        }
+
+        // Toggle AutoScroll Behavior
+        function toggleAutoScroll() {
+            autoScroll = !autoScroll;
+            const btn = document.getElementById('btn-autoscroll');
+            const icon = document.getElementById('icon-autoscroll');
+            if (autoScroll) {
+                btn.className = 'bg-emerald-600/15 text-emerald-700 hover:bg-emerald-600/20 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition';
+                icon.className = 'fa-solid fa-toggle-on text-emerald-600';
+                btn.querySelector('span').innerText = 'ON';
+            } else {
+                btn.className = 'bg-slate-200 text-slate-600 hover:bg-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition';
+                icon.className = 'fa-solid fa-toggle-off text-slate-400';
+                btn.querySelector('span').innerText = 'OFF';
+            }
+        }
+
+        // Check if all dialogues have been read/practiced
+        function checkPracticeStatus() {
+            const statusCard = document.getElementById('practice-complete-card');
+            if (visitedLines.size === dialogueData.length) {
+                statusCard.classList.remove('hidden');
+                statusCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                statusCard.classList.add('hidden');
+            }
+        }
+
+        function resetPractice() {
+            visitedLines.clear();
+            renderDialogue();
+            resetTimer();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Timer functionalities
+        function toggleTimer() {
+            const btn = document.getElementById('btn-timer-toggle');
+            const icon = document.getElementById('icon-timer-play');
+            const text = document.getElementById('text-timer-play');
+
+            if (isTimerRunning) {
+                // Pause Timer
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                btn.className = 'bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition text-white font-medium py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 shadow-sm';
+                icon.className = 'fa-solid fa-play';
+                text.innerText = 'Mulai';
+            } else {
+                // Start Timer
+                timerInterval = setInterval(updateTimer, 1000);
+                isTimerRunning = true;
+                btn.className = 'bg-amber-500 hover:bg-amber-600 active:scale-95 transition text-white font-medium py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 shadow-sm';
+                icon.className = 'fa-solid fa-pause';
+                text.innerText = 'Jeda';
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            totalSeconds = 0;
+            document.getElementById('timer-display').innerText = '00:00';
+            
+            const btn = document.getElementById('btn-timer-toggle');
+            const icon = document.getElementById('icon-timer-play');
+            const text = document.getElementById('text-timer-play');
+            
+            btn.className = 'bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition text-white font-medium py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 shadow-sm';
+            icon.className = 'fa-solid fa-play';
+            text.innerText = 'Mulai';
+        }
+
+        function updateTimer() {
+            totalSeconds++;
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            const formattedMin = String(minutes).padStart(2, '0');
+            const formattedSec = String(seconds).padStart(2, '0');
+            
+            const timerDisplay = document.getElementById('timer-display');
+            timerDisplay.innerText = `${formattedMin}:${formattedSec}`;
+
+            // Visual reward/pacing helper near the 3-minute mark
+            if (totalSeconds >= 180) {
+                timerDisplay.className = 'text-4xl font-bold text-emerald-600 tracking-wider animate-bounce';
+            } else {
+                timerDisplay.className = 'text-4xl font-bold text-slate-700 tracking-wider';
+            }
+        }
+    </script>
+</body>
+</html>
